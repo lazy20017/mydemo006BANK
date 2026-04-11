@@ -1,0 +1,28 @@
+--cpu Cortex-M3
+"mydemo006\startup_stm32f103xe.o"
+"mydemo006\main.o"
+"mydemo006\gpio.o"
+"mydemo006\rtc.o"
+"mydemo006\tim.o"
+"mydemo006\stm32f1xx_it.o"
+"mydemo006\stm32f1xx_hal_msp.o"
+"mydemo006\stm32f1xx_hal_gpio_ex.o"
+"mydemo006\stm32f1xx_hal_rtc.o"
+"mydemo006\stm32f1xx_hal_rtc_ex.o"
+"mydemo006\stm32f1xx_hal.o"
+"mydemo006\stm32f1xx_hal_rcc.o"
+"mydemo006\stm32f1xx_hal_rcc_ex.o"
+"mydemo006\stm32f1xx_hal_gpio.o"
+"mydemo006\stm32f1xx_hal_dma.o"
+"mydemo006\stm32f1xx_hal_cortex.o"
+"mydemo006\stm32f1xx_hal_pwr.o"
+"mydemo006\stm32f1xx_hal_flash.o"
+"mydemo006\stm32f1xx_hal_flash_ex.o"
+"mydemo006\stm32f1xx_hal_exti.o"
+"mydemo006\stm32f1xx_hal_tim.o"
+"mydemo006\stm32f1xx_hal_tim_ex.o"
+"mydemo006\system_stm32f1xx.o"
+--strict --scatter "mydemo006\mydemo006.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "mydemo006.map" -o mydemo006\mydemo006.axf
