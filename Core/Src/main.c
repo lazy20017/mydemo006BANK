@@ -55,7 +55,7 @@ volatile uint8_t rx_done = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+extern void run_all_tests(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -164,6 +164,9 @@ int main(void)
 	 BeepPlay(0,6);
 	 int i=0;
 	
+	// 运行硬件综合测试
+	run_all_tests();
+	
 	while (1)
   {
 		i++;
@@ -239,23 +242,21 @@ void SystemClock_Config(void)
 extern volatile uint8_t rx_done;
 extern uint8_t aRxBuffer[64];
 extern uint8_t rx_data_len;
+extern volatile uint8_t key1_pressed;
+extern volatile uint8_t key2_pressed;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	
-	if(GPIO_Pin==GPIO_PIN_3)
-	{
-//		if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)	==0)	
-//			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_RESET);
-//		
-//		if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)	==1)	
-//			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
-		
-	}
-		if(GPIO_Pin==GPIO_PIN_4)
-	{
-		//HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,0);
-	}
+    if(GPIO_Pin == GPIO_PIN_3)
+    {
+        // Key2 (PE3) 按下，设置标志位
+        key2_pressed = 1;
+    }
+    else if(GPIO_Pin == GPIO_PIN_4)
+    {
+        // Key1 (PE4) 按下，设置标志位
+        key1_pressed = 1;
+    }
 }
 
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
