@@ -637,6 +637,11 @@
               <FileType>1</FileType>
               <FilePath>..\Core\Src\myapp.c</FilePath>
             </File>
+            <File>
+              <FileName>myapp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Core\Inc\myapp.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

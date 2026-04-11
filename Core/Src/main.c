@@ -27,7 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "myapp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,13 +55,7 @@ volatile uint8_t rx_done = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-extern void run_all_tests(void);
-extern void morse_game_init(void);
-extern void morse_handle_input(uint8_t ch);
-extern void morse_key1_action(void);
-extern void morse_key2_reset(void);
-extern volatile uint8_t key1_pressed;
-extern volatile uint8_t key2_pressed;
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/

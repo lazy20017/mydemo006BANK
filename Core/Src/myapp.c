@@ -2,22 +2,21 @@
 #include  "stdio.h"
 #include "tim.h"
 #include "usart.h"
+#include "myapp.h"
 
 extern UART_HandleTypeDef huart1;
 extern uint8_t aRxBuffer[1];
 
-/* ================== 按键状态标志 ================== */
-volatile uint8_t key1_pressed = 0;  // Key1 中断标志
-volatile uint8_t key2_pressed = 0;  // Key2 中断标志
-volatile uint32_t key1_last_tick = 0;  // Key1 上次触发时间
-volatile uint32_t key2_last_tick = 0;  // Key2 上次触发时间
-#define KEY_DEBOUNCE_MS  500  // 防抖时间
+/* ================== 按键状态标志（定义） ================== */
+volatile uint8_t key1_pressed = 0;   // Key1 中断标志
+volatile uint8_t key2_pressed = 0;   // Key2 中断标志
+volatile uint32_t key1_last_tick = 0; // Key1 上次触发时间
+volatile uint32_t key2_last_tick = 0; // Key2 上次触发时间
 
 /* ================== UART FIFO接收缓冲区 ================== */
-#define UART_RX_FIFO_SIZE 256
-uint8_t uart_rx_fifo[UART_RX_FIFO_SIZE];
-volatile uint16_t uart_rx_write = 0;   // 写指针（中断中更新）
-volatile uint16_t uart_rx_read = 0;    // 读指针（主循环中更新）
+static uint8_t uart_rx_fifo[UART_RX_FIFO_SIZE];
+static volatile uint16_t uart_rx_write = 0;   // 写指针（中断中更新）
+static volatile uint16_t uart_rx_read = 0;    // 读指针（主循环中更新）
 
 /* 获取FIFO中可用字节数 */
 uint16_t uart_fifo_available(void)
@@ -50,9 +49,6 @@ int uart_fifo_read_all(uint8_t *buf, int max_len)
     buf[count] = '\0';
     return count;
 }
-
-// 按键中断回调函数声明 (在 main.c 中实现)
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 /* ================== 测试函数 ================== */
 
@@ -90,9 +86,6 @@ void test_active_buzzer(void)
 
     printf("Done\r\n");
 }
-
-// 蜂鸣器发声基础函数
-void BeepPlay(int tone, int volumeLevel);
 
 // 无源蜂鸣器正确乐谱 (1-3-5-i)
 void test_passive_buzzer_success(void)
