@@ -58,6 +58,7 @@ void SysTick_Handler(void);
 void RTC_IRQHandler(void);
 void EXTI3_IRQHandler(void);
 void EXTI4_IRQHandler(void);
+void USART1_IRQHandler(void);
 void RTC_Alarm_IRQHandler(void);
 void TIM6_IRQHandler(void);
 /* USER CODE BEGIN EFP */

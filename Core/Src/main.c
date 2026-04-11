@@ -20,7 +20,9 @@
 #include "main.h"
 #include "rtc.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
+#include <stdio.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -139,31 +141,37 @@ int main(void)
   MX_TIM6_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	uint8_t key0_state, key1_state;
-	uint8_t key0_last = 1, key1_last = 1;
+	//uint8_t key0_state, key1_state;
+	//uint8_t key0_last = 1, key1_last = 1;
 	
-	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,1);
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,1);
+	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,GPIO_PIN_SET);
 	
    HAL_TIM_Base_Start_IT(&htim6);
 	 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
 	 HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_2);
 	 
-	 BeepPlay(533,6);
+	 BeepPlay(0,6);
+	 int i=0;
 	
 	while (1)
   {
+		i++;
+		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_5);
+		printf("i=%d\n\r",i);
+		//HAL_UART_Transmit(&huart1,"hello",5,1000);
 		
-			for( int i=0;i<sizeof(mymusic)/sizeof(mymusic[0]);i++)
-	{
-		playnote(mymusic[i][0],mymusic[i][1]);
-	}
+//			for( int i=0;i<sizeof(mymusic)/sizeof(mymusic[0]);i++)
+//	{
+//		playnote(mymusic[i][0],mymusic[i][1]);
+//	}
 //		key0_state = HAL_GPIO_ReadPin(KEY0_GPIO_Port, KEY0_Pin);
 //		key1_state = HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin);
 //		
@@ -244,11 +252,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	
 	if(GPIO_Pin==GPIO_PIN_3)
 	{
-		if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)	==0)	
-			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,0);
-		
-		if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)	==1)	
-			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,1);
+//		if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)	==0)	
+//			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_RESET);
+//		
+//		if(HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3)	==1)	
+//			HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
 		
 	}
 		if(GPIO_Pin==GPIO_PIN_4)
@@ -276,7 +284,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	int mypwmduty_max=10000;
 	if(htim==&htim6)
 	{
-		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_5);
+		//HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_5);
 		
 		if(myflag==1)
 		{

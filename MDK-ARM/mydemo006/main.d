@@ -29,6 +29,8 @@ mydemo006\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc.h
 mydemo006\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rtc_ex.h
 mydemo006\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 mydemo006\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
+mydemo006\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 mydemo006\main.o: ../Core/Inc/rtc.h
 mydemo006\main.o: ../Core/Inc/tim.h
+mydemo006\main.o: ../Core/Inc/usart.h
 mydemo006\main.o: ../Core/Inc/gpio.h
