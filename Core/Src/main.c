@@ -166,20 +166,28 @@ int main(void)
 	
 	// 运行硬件综合测试
 	run_all_tests();
-	
+
 	while (1)
   {
 		i++;
 		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_5);
 		printf("i=%d\n\r",i);
 
-		if(rx_done == 1)
+		// FIFO模式：读指针追赶写指针
+		int avail = uart_fifo_available();
+		if(avail > 0)
 		{
-			rx_done = 0;
-			aRxBuffer[rx_data_len] = '\0';
-			printf("recv:%s\n\r", aRxBuffer);
-			rx_data_len = 0;
-			memset(aRxBuffer, 0, 64);
+			uint8_t buf[256];
+			int len = uart_fifo_read_all(buf, sizeof(buf));
+			if(len > 0)
+			{
+				printf("recv len=%d: ", len);
+				for(int k=0; k<len; k++)
+				{
+					printf("%02X ", buf[k]);
+				}
+				printf("\n\r");
+			}
 		}
 
 		HAL_Delay(1000);
@@ -239,25 +247,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-extern volatile uint8_t rx_done;
-extern uint8_t aRxBuffer[64];
-extern uint8_t rx_data_len;
 extern volatile uint8_t key1_pressed;
 extern volatile uint8_t key2_pressed;
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-    if(GPIO_Pin == GPIO_PIN_3)
-    {
-        // Key2 (PE3) 按下，设置标志位
-        key2_pressed = 1;
-    }
-    else if(GPIO_Pin == GPIO_PIN_4)
-    {
-        // Key1 (PE4) 按下，设置标志位
-        key1_pressed = 1;
-    }
-}
+
 
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {

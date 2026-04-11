@@ -32,3 +32,4 @@ mydemo006\myapp.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 mydemo006\myapp.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 mydemo006\myapp.o: ../Core/Inc/tim.h
 mydemo006\myapp.o: ../Core/Inc/main.h
+mydemo006\myapp.o: ../Core/Inc/usart.h

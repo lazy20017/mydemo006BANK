@@ -1,15 +1,52 @@
 #include "stm32f1xx_hal.h"
 #include  "stdio.h"
 #include "tim.h"
+#include "usart.h"
 
 extern UART_HandleTypeDef huart1;
-extern uint8_t aRxBuffer[64];
-extern uint8_t rx_data_len;
-extern volatile uint8_t rx_done;
+extern uint8_t aRxBuffer[1];
 
 /* ================== 按键状态标志 ================== */
 volatile uint8_t key1_pressed = 0;  // Key1 中断标志
 volatile uint8_t key2_pressed = 0;  // Key2 中断标志
+
+/* ================== UART FIFO接收缓冲区 ================== */
+#define UART_RX_FIFO_SIZE 256
+uint8_t uart_rx_fifo[UART_RX_FIFO_SIZE];
+volatile uint16_t uart_rx_write = 0;   // 写指针（中断中更新）
+volatile uint16_t uart_rx_read = 0;    // 读指针（主循环中更新）
+
+/* 获取FIFO中可用字节数 */
+uint16_t uart_fifo_available(void)
+{
+    if(uart_rx_write >= uart_rx_read)
+        return uart_rx_write - uart_rx_read;
+    else
+        return UART_RX_FIFO_SIZE - uart_rx_read + uart_rx_write;
+}
+
+/* 从FIFO读取一个字节，返回0表示空 */
+uint8_t uart_fifo_read(uint8_t *byte)
+{
+    if(uart_rx_read == uart_rx_write)
+        return 0;
+    *byte = uart_rx_fifo[uart_rx_read];
+    uart_rx_read = (uart_rx_read + 1) % UART_RX_FIFO_SIZE;
+    return 1;
+}
+
+/* 读取所有可用数据，返回读取的字节数 */
+int uart_fifo_read_all(uint8_t *buf, int max_len)
+{
+    int count = 0;
+    while(uart_rx_read != uart_rx_write && count < max_len - 1)
+    {
+        buf[count++] = uart_rx_fifo[uart_rx_read];
+        uart_rx_read = (uart_rx_read + 1) % UART_RX_FIFO_SIZE;
+    }
+    buf[count] = '\0';
+    return count;
+}
 
 // 按键中断回调函数声明 (在 main.c 中实现)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
@@ -93,7 +130,7 @@ void test_passive_buzzer_error(void)
 // 按键测试 (使用中断标志)
 void test_keys(void)
 {
-    printf("\r\n=== Key Test (Interrupt) ===\r\n");
+    printf("\r\n=== Key Test (Interrupt  5 seconds) ===\r\n");
     printf("Press keys to see output\r\n");
     printf("Key1=Start/Replay, Key2=Reset\r\n");
 
@@ -202,22 +239,27 @@ int fputc(int ch, FILE *f)
   return ch;
 }
 
-
+/* ================== UART FIFO接收回调 ================== */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(huart == &huart1)
     {
-        if(aRxBuffer[rx_data_len] == '\n')
-        {
-            rx_done = 1;
-        }
-        else
-        {
-            if(rx_data_len < 63)
-            {
-                rx_data_len++;
-            }
-        }
-        HAL_UART_Receive_IT(&huart1, aRxBuffer + rx_data_len, 1);
+        uart_rx_fifo[uart_rx_write] = aRxBuffer[0];
+        uart_rx_write = (uart_rx_write + 1) % UART_RX_FIFO_SIZE;
+        HAL_UART_Receive_IT(&huart1, &aRxBuffer[0], 1);
+    }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if(GPIO_Pin == GPIO_PIN_3)
+    {
+        // Key2 (PE3) 按下，设置标志位
+        key2_pressed = 1;
+    }
+    else if(GPIO_Pin == GPIO_PIN_4)
+    {
+        // Key1 (PE4) 按下，设置标志位
+        key1_pressed = 1;
     }
 }

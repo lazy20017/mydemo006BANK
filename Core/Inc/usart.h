@@ -33,8 +33,10 @@ extern "C" {
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;
-extern uint8_t aRxBuffer[64];
-extern uint8_t rx_data_len;
+extern uint8_t aRxBuffer[1];
+extern uint8_t uart_rx_fifo[256];
+extern volatile uint16_t uart_rx_write;
+extern volatile uint16_t uart_rx_read;
 
 /* USER CODE BEGIN Private defines */
 
@@ -43,7 +45,9 @@ extern uint8_t rx_data_len;
 void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+uint16_t uart_fifo_available(void);
+uint8_t uart_fifo_read(uint8_t *byte);
+int uart_fifo_read_all(uint8_t *buf, int max_len);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

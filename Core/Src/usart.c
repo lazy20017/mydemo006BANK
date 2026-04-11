@@ -21,8 +21,8 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-uint8_t aRxBuffer[64];
-uint8_t rx_data_len = 0;
+extern UART_HandleTypeDef huart1;
+uint8_t aRxBuffer[1];  // 中断接收用的单字节缓冲区
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
