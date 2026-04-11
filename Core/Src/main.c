@@ -23,6 +23,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include <stdio.h>
+#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -48,6 +49,7 @@
 
 /* USER CODE BEGIN PV */
 volatile uint32_t delay_ms = 500;
+volatile uint8_t rx_done = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -143,7 +145,8 @@ int main(void)
   MX_TIM4_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+  HAL_UART_Receive_IT(&huart1, aRxBuffer, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -166,30 +169,16 @@ int main(void)
 		i++;
 		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_5);
 		printf("i=%d\n\r",i);
-		//HAL_UART_Transmit(&huart1,"hello",5,1000);
-		
-//			for( int i=0;i<sizeof(mymusic)/sizeof(mymusic[0]);i++)
-//	{
-//		playnote(mymusic[i][0],mymusic[i][1]);
-//	}
-//		key0_state = HAL_GPIO_ReadPin(KEY0_GPIO_Port, KEY0_Pin);
-//		key1_state = HAL_GPIO_ReadPin(KEY1_GPIO_Port, KEY1_Pin);
-//		
-//		if (key0_state == 0 && key0_last == 1)
-//		{
-//			if (delay_ms > 10)
-//				delay_ms -= 100;
-//		}
-//		if (key1_state == 0 && key1_last == 1)
-//		{
-//			if (delay_ms < 10000)
-//				delay_ms += 100;
-//		}
-//		key0_last = key0_state;
-//		key1_last = key1_state;
-//		
-//		HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
-//		HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+
+		if(rx_done == 1)
+		{
+			rx_done = 0;
+			aRxBuffer[rx_data_len] = '\0';
+			printf("recv:%s\n\r", aRxBuffer);
+			rx_data_len = 0;
+			memset(aRxBuffer, 0, 64);
+		}
+
 		HAL_Delay(1000);
     
     /* USER CODE END WHILE */
@@ -247,6 +236,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+extern volatile uint8_t rx_done;
+extern uint8_t aRxBuffer[64];
+extern uint8_t rx_data_len;
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	
@@ -264,7 +257,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		//HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,0);
 	}
 }
-
 
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {

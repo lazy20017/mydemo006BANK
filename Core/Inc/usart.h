@@ -33,6 +33,8 @@ extern "C" {
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;
+extern uint8_t aRxBuffer[64];
+extern uint8_t rx_data_len;
 
 /* USER CODE BEGIN Private defines */
 

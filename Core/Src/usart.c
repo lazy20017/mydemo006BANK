@@ -21,7 +21,8 @@
 #include "usart.h"
 
 /* USER CODE BEGIN 0 */
-
+uint8_t aRxBuffer[64];
+uint8_t rx_data_len = 0;
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
@@ -52,7 +53,7 @@ void MX_USART1_UART_Init(void)
   }
   /* USER CODE BEGIN USART1_Init 2 */
 
-  /* USER CODE END USART1_Init 2 */
+/* USER CODE END USART1_Init 2 */
 
 }
 
