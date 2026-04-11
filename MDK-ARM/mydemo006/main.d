@@ -34,6 +34,4 @@ mydemo006\main.o: ../Core/Inc/rtc.h
 mydemo006\main.o: ../Core/Inc/tim.h
 mydemo006\main.o: ../Core/Inc/usart.h
 mydemo006\main.o: ../Core/Inc/gpio.h
-mydemo006\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-mydemo006\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 mydemo006\main.o: ../Core/Inc/myapp.h

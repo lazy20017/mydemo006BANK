@@ -52,17 +52,20 @@ int uart_fifo_read_all(uint8_t *buf, int max_len)
 
 /* ================== 测试函数 ================== */
 
-// 有源蜂鸣器测试 (PB8) - 播放摩斯码字符
+// 有源蜂鸣器测试 (PB8) + LED1同步闪烁 (PB5)
 void test_active_buzzer(void)
 {
-    printf("\r\n=== Active Buzzer Test ===\r\n");
+    printf("\r\n=== Active Buzzer + LED1 Test ===\r\n");
     printf("Playing Morse: SOS (...---...)\r\n");
+    printf("LED1(PB5) blinks with buzzer\r\n");
 
     // S: ... (3 dots)
     for(int i=0; i<3; i++) {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);  // ON
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);   // 蜂鸣器ON
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);  // LED1亮（低电平）
         HAL_Delay(200);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // OFF
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // 蜂鸣器OFF
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);    // LED1灭
         HAL_Delay(200);
     }
     HAL_Delay(300);  // Letter gap
@@ -70,8 +73,10 @@ void test_active_buzzer(void)
     // O: --- (3 dashes)
     for(int i=0; i<3; i++) {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
         HAL_Delay(600);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
         HAL_Delay(200);
     }
     HAL_Delay(300);
@@ -79,11 +84,14 @@ void test_active_buzzer(void)
     // S: ...
     for(int i=0; i<3; i++) {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
         HAL_Delay(200);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
         HAL_Delay(200);
     }
 
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);  // 确保LED1熄灭
     printf("Done\r\n");
 }
 
@@ -148,35 +156,22 @@ void test_keys(void)
     printf("Key Test Done\r\n");
 }
 
-// LED测试 - 使用TIM3_CH2 (PB5)
+// LED1测试 (PB5) - GPIO输出闪烁
 void test_led_pwm(uint32_t frequency, uint32_t duration_sec)
 {
-    printf("\r\n=== LED PWM Test ===\r\n");
+    printf("\r\n=== LED1(PB5) GPIO Blink Test ===\r\n");
     printf("Freq: %d Hz, Duration: %d sec\r\n", frequency, duration_sec);
 
-    uint32_t period_ticks = 10000;  // PWM周期
-    uint32_t half_period_ms = 1000 / (frequency * 2);  // 半周期(高低切换)
+    uint32_t interval_ms = 1000 / (frequency * 2);  // 闪烁间隔
 
     uint32_t start_tick = HAL_GetTick();
-    uint8_t led_state = 0;
-
     while(HAL_GetTick() - start_tick < duration_sec * 1000) {
-        // 通过改变PWM比较值实现LED闪烁
-        if(led_state == 0) {
-            __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 0);  // 暗
-        } else {
-            __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, period_ticks/2);  // 亮
-        }
-        led_state = !led_state;
-
-        uint32_t tick_before = HAL_GetTick();
-        while(HAL_GetTick() - tick_before < half_period_ms) {
-            // 等待
-        }
+        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);  // PB5闪烁
+        HAL_Delay(interval_ms);
     }
 
-    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, 0);
-    printf("LED PWM Done\r\n");
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);  // 确保熄灭
+    printf("LED1 PWM Done\r\n");
 }
 
 // LED2测试 (PE5) - GPIO输出
@@ -190,7 +185,36 @@ void test_led2(void)
         HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
         HAL_Delay(500);
     }
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);  // 确保熄灭
     printf("LED2 Done\r\n");
+}
+
+// LED1与蜂鸣器同步闪烁测试
+void test_led1_sync(void)
+{
+    printf("\r\n=== LED1 + Buzzer Sync Test ===\r\n");
+    printf("LED1(PB5) blinks with buzzer (PB8)\r\n");
+    printf("Playing: Letter A (. -)\r\n");
+
+    // A: .- (dot then dash)
+    // Dot (.)
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);   // 蜂鸣器ON
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);  // LED1亮
+    HAL_Delay(200);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); // 蜂鸣器OFF
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);    // LED1灭
+    HAL_Delay(200);
+
+    // Dash (-)
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+    HAL_Delay(600);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+    HAL_Delay(200);
+
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);  // 确保LED1熄灭
+    printf("Done\r\n");
 }
 
 // 综合测试入口
@@ -223,6 +247,10 @@ void run_all_tests(void)
 
     // 7. LED2测试
     test_led2();
+    HAL_Delay(500);
+
+    // 8. LED1+蜂鸣器同步测试
+    test_led1_sync();
 
     printf("########################################\r\n");
     printf("######## Hardware Test Complete ########\r\n");
@@ -281,8 +309,20 @@ typedef struct {
 static GameData_TypeDef game;
 
 /* 有源蜂鸣器发声控制 */
-static void active_beep_on(void) { HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); }
-static void active_beep_off(void) { HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); }
+static void active_beep_on(void) { 
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_SET); 
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);  // LED1同步亮（低电平亮）
+}
+static void active_beep_off(void) { 
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, GPIO_PIN_RESET); 
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);    // LED1同步灭
+}
+
+/* LED2控制 - 状态灯（前置声明） */
+static void led2_on(void);
+static void led2_off(void);
+static void led2_blink(void);
+static void led2_quick_blink(void);
 
 /* 播放一个摩斯码元素：点200ms，划600ms */
 static void play_morse_element(uint8_t element)
@@ -344,6 +384,7 @@ void morse_play_current(void)
     if(game.state == GAME_PLAYING)  /* 未被Key2打断 */
         game.state = GAME_WAIT_ANSWER;
 
+    led2_on();  // 等待输入时LED2亮起
     printf("[Game] Play #%d, please input answer via serial port\r\n", game.play_count);
 }
 
@@ -354,6 +395,7 @@ void morse_new_question(void)
     game.current_char = HAL_GetTick() % 26;  /* 伪随机 */
     game.play_count = 0;
     game.guess_count = 0;
+    led2_off();  // 新题目时LED2熄灭
     /* score保持不变 */
 }
 
@@ -402,14 +444,33 @@ static void play_error_melody(void)
     }
 }
 
-/* LED2闪烁（错误时） */
+/* LED2控制 - 状态灯 */
+static void led2_on(void) { 
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);   // 低电平亮
+}
+static void led2_off(void) { 
+    HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);    // 高电平灭
+}
+
+/* LED2闪烁（错误时/答案公布时）- 更明显的闪烁效果 */
 static void led2_blink(void)
+{
+    for(int i=0; i<5; i++) {
+        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
+        HAL_Delay(150);
+        HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
+        HAL_Delay(150);
+    }
+}
+
+/* LED2快速闪烁（正确答案时）*/
+static void led2_quick_blink(void)
 {
     for(int i=0; i<3; i++) {
         HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
-        HAL_Delay(200);
+        HAL_Delay(100);
         HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
-        HAL_Delay(200);
+        HAL_Delay(100);
     }
 }
 
@@ -418,6 +479,8 @@ static void handle_correct(void)
 {
     game.score += 10;
     play_success_melody();
+    led2_quick_blink();  // 正确答案时LED2快速闪烁
+    led2_off();          // 然后熄灭
     char binstr[8];
     morse_to_binstr(game.current_char, binstr);
     printf("\r\n>>> Correct! Answer is %c  [Morse: %s]\r\n", 'A' + game.current_char, binstr);
@@ -431,7 +494,7 @@ static void handle_wrong(void)
 {
     game.guess_count++;
     play_error_melody();
-    led2_blink();
+    led2_blink();  // 错误时LED2闪烁
     char binstr[8];
     morse_to_binstr(game.current_char, binstr);
 
@@ -439,10 +502,12 @@ static void handle_wrong(void)
         printf("\r\n>>> Wrong! 3 attempts used.\r\n");
         printf(">>> Answer: %c  [Morse: %s]\r\n", 'A' + game.current_char, binstr);
         printf(">>> Returning to idle...\r\n");
+        led2_off();  // 公布答案后LED2熄灭
         HAL_Delay(1000);
         morse_new_question();
     } else {
         printf("\r\n>>> Wrong! Attempts left: %d  [Morse: %s]\r\n", 3 - game.guess_count, binstr);
+        led2_on();  // 还有机会时LED2重新亮起
     }
 }
 

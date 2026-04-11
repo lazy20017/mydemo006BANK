@@ -245,21 +245,12 @@ void EXTI4_IRQHandler(void)
 /**
   * @brief This function handles USART1 global interrupt.
   */
-extern volatile uint8_t rx_done;
-
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
 
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
-
-  if(__HAL_UART_GET_FLAG(&huart1, UART_FLAG_IDLE))
-  {
-    __HAL_UART_CLEAR_IDLEFLAG(&huart1);
-    rx_done = 1;
-  }
-
   /* USER CODE BEGIN USART1_IRQn 1 */
 
   /* USER CODE END USART1_IRQn 1 */

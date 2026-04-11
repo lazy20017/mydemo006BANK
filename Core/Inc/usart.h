@@ -33,10 +33,6 @@ extern "C" {
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;
-extern uint8_t aRxBuffer[1];
-extern uint8_t uart_rx_fifo[256];
-extern volatile uint16_t uart_rx_write;
-extern volatile uint16_t uart_rx_read;
 
 /* USER CODE BEGIN Private defines */
 

@@ -19,12 +19,13 @@ uint8_t uart_fifo_read(uint8_t *byte);                                 // 从FIF
 int uart_fifo_read_all(uint8_t *buf, int max_len);                     // 读取所有可用数据，返回读取的字节数
 
 /* ================== 测试函数 ================== */
-void test_active_buzzer(void);                                        // 有源蜂鸣器测试 - 播放摩斯码SOS
+void test_active_buzzer(void);                                        // 有源蜂鸣器+LED1同步测试 - 播放摩斯码SOS
 void test_passive_buzzer_success(void);                               // 无源蜂鸣器正确乐谱 (1-3-5-i)
 void test_passive_buzzer_error(void);                                  // 无源蜂鸣器错误乐谱 (#4-4-5.)
 void test_keys(void);                                                 // 按键测试（中断5秒）
-void test_led_pwm(uint32_t frequency, uint32_t duration_sec);          // LED PWM测试
+void test_led_pwm(uint32_t frequency, uint32_t duration_sec);          // LED1 GPIO闪烁测试
 void test_led2(void);                                                 // LED2测试 (PE5)
+void test_led1_sync(void);                                            // LED1+蜂鸣器同步测试
 void run_all_tests(void);                                              // 综合测试入口
 
 /* ================== 蜂鸣器基础函数（定义在main.c中）==================== */

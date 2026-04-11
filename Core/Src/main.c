@@ -22,8 +22,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include <stdio.h>
-#include <string.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -48,6 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+extern uint8_t aRxBuffer[1];  // 从usart.c引用接收缓冲区
 volatile uint32_t delay_ms = 500;
 volatile uint8_t rx_done = 0;
 /* USER CODE END PV */
@@ -155,7 +154,6 @@ int main(void)
 	//uint8_t key0_last = 1, key1_last = 1;
 	
 	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_5,GPIO_PIN_SET);
 	
    HAL_TIM_Base_Start_IT(&htim6);
 	 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
@@ -192,7 +190,7 @@ int main(void)
 			morse_key1_action();
 		}
 
-		HAL_Delay(50);
+		HAL_Delay(500);
     
     /* USER CODE END WHILE */
 
