@@ -56,6 +56,12 @@ volatile uint8_t rx_done = 0;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 extern void run_all_tests(void);
+extern void morse_game_init(void);
+extern void morse_handle_input(uint8_t ch);
+extern void morse_key1_action(void);
+extern void morse_key2_reset(void);
+extern volatile uint8_t key1_pressed;
+extern volatile uint8_t key2_pressed;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -162,35 +168,37 @@ int main(void)
 	 HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_2);
 	 
 	 BeepPlay(0,6);
-	 int i=0;
-	
-	// 运行硬件综合测试
-	run_all_tests();
+
+	// 初始化摩斯码训练游戏
+	morse_game_init();
 
 	while (1)
   {
-		i++;
-		HAL_GPIO_TogglePin(GPIOE,GPIO_PIN_5);
-		printf("i=%d\n\r",i);
-
-		// FIFO模式：读指针追赶写指针
+		// FIFO消费：读取所有输入字符
 		int avail = uart_fifo_available();
 		if(avail > 0)
 		{
 			uint8_t buf[256];
 			int len = uart_fifo_read_all(buf, sizeof(buf));
-			if(len > 0)
+			for(int k=0; k<len; k++)
 			{
-				printf("recv len=%d: ", len);
-				for(int k=0; k<len; k++)
-				{
-					printf("%02X ", buf[k]);
-				}
-				printf("\n\r");
+				morse_handle_input(buf[k]);
 			}
 		}
 
-		HAL_Delay(1000);
+		// Key2 高优先级复位（任何状态下立即响应）
+		if(key2_pressed) {
+			key2_pressed = 0;
+			morse_key2_reset();
+		}
+
+		// Key1 处理（启动/重播）
+		if(key1_pressed) {
+			key1_pressed = 0;
+			morse_key1_action();
+		}
+
+		HAL_Delay(50);
     
     /* USER CODE END WHILE */
 
@@ -247,10 +255,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-extern volatile uint8_t key1_pressed;
-extern volatile uint8_t key2_pressed;
-
-
 
 void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)
 {
