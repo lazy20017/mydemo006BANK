@@ -1,6 +1,5 @@
 --cpu Cortex-M3
 "mydemo006\startup_stm32f103xe.o"
-"mydemo006\myapp.o"
 "mydemo006\main.o"
 "mydemo006\gpio.o"
 "mydemo006\rtc.o"
@@ -8,6 +7,7 @@
 "mydemo006\usart.o"
 "mydemo006\stm32f1xx_it.o"
 "mydemo006\stm32f1xx_hal_msp.o"
+"mydemo006\myapp.o"
 "mydemo006\stm32f1xx_hal_gpio_ex.o"
 "mydemo006\stm32f1xx_hal_rtc.o"
 "mydemo006\stm32f1xx_hal_rtc_ex.o"

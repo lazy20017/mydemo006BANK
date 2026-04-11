@@ -1,4 +1,4 @@
-mydemo006\myapp.o: myapp.c
+mydemo006\myapp.o: ..\Core\Src\myapp.c
 mydemo006\myapp.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 mydemo006\myapp.o: ../Core/Inc/stm32f1xx_hal_conf.h
 mydemo006\myapp.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h
