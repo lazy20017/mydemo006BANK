@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "myapp.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -144,30 +145,31 @@ int main(void)
   MX_TIM4_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  __HAL_UART_ENABLE_IT(&huart1, UART_IT_IDLE);
+
   HAL_UART_Receive_IT(&huart1, aRxBuffer, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	//uint8_t key0_state, key1_state;
-	//uint8_t key0_last = 1, key1_last = 1;
 	
-	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_5,GPIO_PIN_SET);
-	
-   HAL_TIM_Base_Start_IT(&htim6);
+   HAL_TIM_Base_Start_IT(&htim6); //
 	 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+	 
+	 
 	 HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_2);
 	 
 	 BeepPlay(0,6);
 
 	// 初始化摩斯码训练游戏
 	morse_game_init();
-
+	int i=0;
 	while (1)
   {
+		i++;
 		// FIFO消费：读取所有输入字符
+		
 		int avail = uart_fifo_available();
+
 		if(avail > 0)
 		{
 			uint8_t buf[256];
@@ -189,6 +191,7 @@ int main(void)
 			key1_pressed = 0;
 			morse_key1_action();
 		}
+
 
 		HAL_Delay(500);
     
