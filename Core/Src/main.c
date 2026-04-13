@@ -140,8 +140,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_RTC_Init();
-  MX_TIM6_Init();
-  MX_TIM3_Init();
+  //MX_TIM6_Init();
+  //MX_TIM3_Init();
   MX_TIM4_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
@@ -152,8 +152,8 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	
-   HAL_TIM_Base_Start_IT(&htim6); //
-	 HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+   //HAL_TIM_Base_Start_IT(&htim6); //
+	 //HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
 	 
 	 
 	 HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_2);
